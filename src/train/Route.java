@@ -40,7 +40,7 @@ public class Route
 		return getStation(stations.size() - 1);
 	}
 	
-	public int getNumStops()
+	public int getNumStations()
 	{
 		return stations.size();
 	}

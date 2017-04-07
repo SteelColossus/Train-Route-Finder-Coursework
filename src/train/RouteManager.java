@@ -12,16 +12,13 @@ public class RouteManager
 		this.setup();
 	}
 	
-	public void setup()
+	private void setup()
 	{
 		Station leicester = new Station("Leicester", true);
 		Station loughborough = new Station("Loughborough", true);
 		Station nottingham = new Station("Nottingham", true);
 		Station derby = new Station("Derby", true);
 		Station york = new Station("York", true);
-		
-		Station sheffield = new Station("Sheffield");
-		Station doncaster = new Station("Doncaster");
 		
 		stations = new ArrayList<Station>();
 		
@@ -31,15 +28,11 @@ public class RouteManager
 		stations.add(derby);
 		stations.add(york);
 		
-		stations.add(sheffield);
-		stations.add(doncaster);
-		
 		routes = new ArrayList<Route>();
 		
 		routes.add(new Route(leicester, loughborough, 10, 2, 50, 4, 0));
 		routes.add(new Route(leicester, nottingham, 30, 3, 50, 6, 20));
 		routes.add(new Route(leicester, derby, 48, 3, 70, 7, 0));
-		routes.add(new Route(leicester, york, 65, 23, 50, 25, 0));
 		routes.add(new Route(leicester, york, 65, 23, 50, 25, 0));
 		routes.add(new Route(loughborough, leicester, 10, 2, 50, 4, 0));
 		routes.add(new Route(loughborough, nottingham, 15, 1, 50, 2, 50));
@@ -57,12 +50,9 @@ public class RouteManager
 		routes.add(new Route(york, loughborough, 60, 12, 0, 20, 0));
 		routes.add(new Route(york, nottingham, 40, 8, 20, 16, 0));
 		routes.add(new Route(york, derby, 75, 11, 20, 16, 0));
-		
-		getRoute(leicester, york).addStop(sheffield);
-		getRoute(leicester, york).addStop(doncaster);
 	}
-
-	public ArrayList<Station> getStations()
+	
+	public ArrayList<Station> getAllStations()
 	{
 		return stations;
 	}
