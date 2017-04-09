@@ -7,49 +7,80 @@ import java.util.stream.IntStream;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class Menu
+public class MainMenu
 {
 	private RouteManager manager;
+	private AdminMenu adminMenu;
 	
-	public Menu(RouteManager rm)
+	// Form components
+	private JFrame frame;
+	
+	private JPanel flowButtonPanel;
+	private JPanel buttonPanel;
+	private JPanel contentPanel;
+	private JPanel datePanel;
+	private JPanel stationPanel;
+	
+	private JButton timeButton;
+	private JButton priceButton;
+	private JButton routeButton;
+	private JButton sortButton;
+	private JButton adminButton;
+	private JButton exitButton;
+	
+	private JLabel monthLabel;
+	private JLabel dayLabel;
+	private JLabel fromLabel;
+	private JLabel toLabel;
+	private JLabel infoLabel;
+	
+	private JComboBox<String> monthBox;
+	private JComboBox<String> dayBox;
+	private JComboBox<String> fromBox;
+	private JComboBox<String> toBox;
+	
+	public MainMenu(RouteManager rm)
 	{
 		this.manager = rm;
+		this.setup();
+		
+		adminMenu = new AdminMenu(rm);
 	}
 	
-	public void start()
+	private void setup()
 	{
-		JFrame frame = new JFrame();
+		frame = new JFrame();
 		frame.setTitle("Train Route Finder");
 		frame.setSize(500, 250);
 		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setResizable(false);
 
-		JPanel flowButtonPanel = new JPanel(new FlowLayout());
-		JPanel buttonPanel = new JPanel();
-		GridLayout gb = new GridLayout(6, 1, 5, 2);
-		buttonPanel.setLayout(gb);
+		flowButtonPanel = new JPanel();
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridLayout(6, 1, 5, 2));
 		
-		JButton timeButton = new JButton("Time");
-		JButton priceButton = new JButton("Price");
-		JButton routeButton = new JButton("Route");
-		JButton sortButton = new JButton("Sort");
-		JButton adminButton = new JButton("Admin");
-		JButton exitButton = new JButton("End");
+		timeButton = new JButton("Time");
+		priceButton = new JButton("Price");
+		routeButton = new JButton("Route");
+		sortButton = new JButton("Sort");
+		adminButton = new JButton("Admin");
+		exitButton = new JButton("End");
 		
 		timeButton.setPreferredSize(new Dimension(timeButton.getPreferredSize().width, 33));
 		
-		JPanel contentPanel = new JPanel();
+		contentPanel = new JPanel();
 		contentPanel.setLayout(new GridBagLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
+		datePanel = new JPanel();
+		datePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 4));
 		
-		JLabel monthLabel = new JLabel("Month:");
-		JLabel dayLabel = new JLabel("Day:");
+		monthLabel = new JLabel("Month:");
+		dayLabel = new JLabel("Day:");
 		
-		JComboBox<String> monthBox = new JComboBox<String>(IntStream.rangeClosed(1, 12).mapToObj(Integer::toString).toArray(String[]::new));
-		JComboBox<String> dayBox = new JComboBox<String>();
+		monthBox = new JComboBox<String>(IntStream.rangeClosed(1, 12).mapToObj(Integer::toString).toArray(String[]::new));
+		dayBox = new JComboBox<String>();
 		
 		monthBox.setSelectedIndex(-1);
 		dayBox.setSelectedIndex(-1);
@@ -62,13 +93,13 @@ public class Menu
 		
 		String[] stationNameList = manager.getAllStations().stream().filter(x -> x.isMain()).map(Station::getName).toArray(String[]::new);
 		
-		JPanel stationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
+		stationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
 		
-		JLabel fromLabel = new JLabel("From:");
-		JLabel toLabel = new JLabel("To:");
+		fromLabel = new JLabel("From:");
+		toLabel = new JLabel("To:");
 		
-		JComboBox<String> fromBox = new JComboBox<String>(stationNameList);		
-		JComboBox<String> toBox = new JComboBox<String>(stationNameList);
+		fromBox = new JComboBox<String>(stationNameList);		
+		toBox = new JComboBox<String>(stationNameList);
 		
 		fromBox.setSelectedIndex(-1);
 		toBox.setSelectedIndex(-1);
@@ -76,41 +107,10 @@ public class Menu
 		fromBox.setPreferredSize(new Dimension(120, fromBox.getMinimumSize().height));
 		toBox.setPreferredSize(new Dimension(120, toBox.getMinimumSize().height));
 		
-		JLabel infoLabel = new JLabel();
+		infoLabel = new JLabel();
 		infoLabel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		
-		monthBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-			{
-				int endDay;
-				int prevIndex = dayBox.getSelectedIndex();
-				
-				switch (monthBox.getSelectedIndex())
-				{
-					case 1:
-						endDay = 28;
-						break;
-					case 3:
-					case 5:
-					case 8:
-					case 10:
-						endDay = 30;
-						break;
-					default:
-						endDay = 31;
-						break;
-				}
-				
-				dayBox.removeAllItems();
-				IntStream.rangeClosed(1, endDay).mapToObj(Integer::toString).forEach(x -> dayBox.addItem(x));
-				
-				if (prevIndex < 0) prevIndex = 0;
-				else if (prevIndex >= endDay) prevIndex = endDay - 1;
-				
-				dayBox.setSelectedIndex(prevIndex);
-			}
-		});
-		
+		// Action listeners
 		timeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -122,6 +122,14 @@ public class Menu
 					{
 						infoLabel.setText("Time taken: " + currentRoute.getDuration().formatAsWords());
 					}
+					else
+					{
+						infoLabel.setText("Please enter a valid route.");
+					}
+				}
+				else
+				{
+					infoLabel.setText("<html>Please enter a valid departure date,<br>origin station and destination station.</html>");
 				}
 			}
 		});
@@ -155,6 +163,14 @@ public class Menu
 						priceStr += "</html>";
 						infoLabel.setText(priceStr);
 					}
+					else
+					{
+						infoLabel.setText("Please enter a valid route.");
+					}
+				}
+				else
+				{
+					infoLabel.setText("<html>Please enter a valid departure date,<br>origin station and destination station.</html>");
 				}
 			}
 		});
@@ -178,6 +194,14 @@ public class Menu
 						
 						infoLabel.setText("Route: " + routeStr);
 					}
+					else
+					{
+						infoLabel.setText("Please enter a valid route.");
+					}
+				}
+				else
+				{
+					infoLabel.setText("<html>Please enter a valid departure date,<br>origin station and destination station.</html>");
 				}
 			}
 		});
@@ -191,6 +215,7 @@ public class Menu
 		adminButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				adminMenu.show();
 			}
 		});
 		
@@ -198,6 +223,69 @@ public class Menu
 			public void actionPerformed(ActionEvent e)
 			{
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			}
+		});
+		
+		monthBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				int endDay;
+				int prevIndex = dayBox.getSelectedIndex();
+				
+				switch (monthBox.getSelectedIndex())
+				{
+					case 1:
+						endDay = 28;
+						break;
+					case 3:
+					case 5:
+					case 8:
+					case 10:
+						endDay = 30;
+						break;
+					default:
+						endDay = 31;
+						break;
+				}
+				
+				dayBox.removeAllItems();
+				IntStream.rangeClosed(1, endDay).mapToObj(Integer::toString).forEach(x -> dayBox.addItem(x));
+				
+				if (prevIndex < 0) prevIndex = 0;
+				else if (prevIndex >= endDay) prevIndex = endDay - 1;
+				
+				dayBox.setSelectedIndex(prevIndex);
+			}
+		});
+		
+		fromBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				String prevStr = (toBox.getSelectedItem() == null) ? null : toBox.getSelectedItem().toString();
+				
+				toBox.removeAllItems();
+
+				manager.getAllStations().stream().filter(x -> x.isMain() && x.getName() != fromBox.getSelectedItem()).map(Station::getName).forEach(x -> toBox.addItem(x));
+				
+				if (prevStr == null || fromBox.getSelectedItem() == prevStr)
+				{
+					toBox.setSelectedIndex(-1);
+				}
+				else
+				{
+					toBox.setSelectedItem(prevStr);
+				}
+			}
+		});
+		
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent windowEvent) {
+				int exit = JOptionPane.showConfirmDialog(frame, "Are you sure you want to exit the program?", "Exit", JOptionPane.YES_NO_OPTION);
+				
+				if (exit == JOptionPane.YES_OPTION)
+				{
+					System.exit(0);
+				}
 			}
 		});
 		
@@ -243,7 +331,15 @@ public class Menu
 		
 		frame.add(flowButtonPanel);
 		frame.add(contentPanel);
-		
+	}
+	
+	public void show()
+	{
 		frame.setVisible(true);
+	}
+	
+	public void hide()
+	{
+		frame.setVisible(false);
 	}
 }
