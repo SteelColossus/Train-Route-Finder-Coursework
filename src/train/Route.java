@@ -1,6 +1,7 @@
 package train;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Route
 {	
@@ -27,7 +28,7 @@ public class Route
 	
 	public Station getStation(int index)
 	{
-		return index >= stations.size() ? null : stations.get(index);
+		return index >= getNumStations() ? null : stations.get(index);
 	}
 	
 	public Station getStartStation()
@@ -40,9 +41,19 @@ public class Route
 		return getStation(stations.size() - 1);
 	}
 	
+	public Station getStop(int index)
+	{
+		return index >= getNumStops() ? null : stations.stream().filter(x -> !x.isMain()).collect(Collectors.toList()).get(index);
+	}
+	
 	public int getNumStations()
 	{
 		return stations.size();
+	}
+	
+	public int getNumStops()
+	{
+		return (int) stations.stream().filter(x -> !x.isMain()).count();
 	}
 	
 	public void addStation(Station s, int i)
@@ -53,6 +64,11 @@ public class Route
 	public void addStop(Station s)
 	{
 		addStation(s, stations.size() - 1);
+	}
+	
+	public void removeStation(Station s)
+	{
+		stations.remove(s);
 	}
 	
 	public Duration getDuration()

@@ -43,6 +43,14 @@ public class RouteManager
 		this.addRoute(york, loughborough, 60, 12, 0, 20, 0);
 		this.addRoute(york, nottingham, 40, 8, 20, 16, 0);
 		this.addRoute(york, derby, 75, 11, 20, 16, 0);
+
+		Station barrow = new Station("Barrow-on-soar", false);
+		this.addStation(barrow);
+		this.getRoute(leicester, loughborough).addStop(barrow);
+		
+		Station quorn = new Station("Quorn", false);
+		this.addStation(quorn);
+		this.getRoute(leicester, loughborough).addStop(quorn);
 	}
 	
 	public ArrayList<Station> getAllStations()

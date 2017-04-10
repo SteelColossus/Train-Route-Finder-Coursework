@@ -65,7 +65,7 @@ public class MainMenu
 		routeButton = new JButton("Route");
 		sortButton = new JButton("Sort");
 		adminButton = new JButton("Admin");
-		exitButton = new JButton("End");
+		exitButton = new JButton("Exit");
 		
 		timeButton.setPreferredSize(new Dimension(timeButton.getPreferredSize().width, 33));
 		
@@ -261,6 +261,12 @@ public class MainMenu
 		fromBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				if (fromBox.getSelectedItem() == toBox.getSelectedItem())
+				{
+					toBox.setSelectedIndex(-1);
+				}
+				
+				/*
 				String prevStr = (toBox.getSelectedItem() == null) ? null : toBox.getSelectedItem().toString();
 				
 				toBox.removeAllItems();
@@ -274,6 +280,17 @@ public class MainMenu
 				else
 				{
 					toBox.setSelectedItem(prevStr);
+				}
+				*/
+			}
+		});
+		
+		toBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (fromBox.getSelectedItem() == toBox.getSelectedItem())
+				{
+					fromBox.setSelectedIndex(-1);
 				}
 			}
 		});

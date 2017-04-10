@@ -1,5 +1,6 @@
 package train;
 
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -7,13 +8,17 @@ import java.awt.event.WindowEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 
 public class AdminMenu
 {
 	@SuppressWarnings("unused")
 	private RouteManager manager;
+	private InputRouteMenu inputRouteMenu;
 
 	private JDialog frame;
+	
+	private JPanel buttonPanel;
 	
 	private JButton inputButton;
 	private JButton saveButton;
@@ -24,6 +29,8 @@ public class AdminMenu
 	{
 		this.manager = rm;
 		this.setup();
+		
+		inputRouteMenu = new InputRouteMenu(rm);
 	}
 	
 	private void setup()
@@ -35,10 +42,19 @@ public class AdminMenu
 		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frame.setResizable(false);
 		
+		buttonPanel = new JPanel(new GridLayout(4, 1, 5, 2));
+		
 		inputButton = new JButton("Input route");
-		saveButton = new JButton("Save route");
-		loadButton = new JButton("Retrieve route");
+		saveButton = new JButton("Save routes");
+		loadButton = new JButton("Retrieve routes");
 		exitButton = new JButton("Exit");
+		
+		inputButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				inputRouteMenu.show();
+			}
+		});
 		
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
@@ -47,10 +63,12 @@ public class AdminMenu
 			}
 		});
 		
-		frame.add(inputButton);
-		frame.add(saveButton);
-		frame.add(loadButton);
-		frame.add(exitButton);
+		buttonPanel.add(inputButton);
+		buttonPanel.add(saveButton);
+		buttonPanel.add(loadButton);
+		buttonPanel.add(exitButton);
+		
+		frame.add(buttonPanel);
 	}
 
 	public void show()
