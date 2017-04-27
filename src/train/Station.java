@@ -35,4 +35,9 @@ public class Station
 	{
 		this.main = main;
 	}
+	
+	public boolean areSame(Station other)
+	{
+		return name.equals(other.getName());
+	}
 }

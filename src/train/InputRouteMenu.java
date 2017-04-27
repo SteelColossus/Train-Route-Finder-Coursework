@@ -34,8 +34,8 @@ public class InputRouteMenu
 	
 	public InputRouteMenu(RouteManager rm)
 	{
-		this.manager = rm;
-		this.setup();
+		manager = rm;
+		setup();
 	}
 	
 	private void setup()
@@ -49,6 +49,7 @@ public class InputRouteMenu
 		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frame.setResizable(false);
+		frame.setModal(true);
 		
 		stopsPanel = new JPanel();
 		stopsPanel.setLayout(new BoxLayout(stopsPanel, BoxLayout.Y_AXIS));
@@ -94,8 +95,9 @@ public class InputRouteMenu
 	
 	private void addNewStop()
 	{
-		Station s = new Station(newStop.getText(), false);
-		manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString()).addStop(s);
+		Station s = manager.addStation(newStop.getText(), false);
+		Route r = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
+		manager.addRouteStop(r, s);
 		updateStops();
 	}
 	

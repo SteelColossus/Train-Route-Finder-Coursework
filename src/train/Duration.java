@@ -7,8 +7,26 @@ public class Duration
 	
 	public Duration(int h, int m)
 	{
-		this.hours = h;
-		this.minutes = m;
+		setDuration(h, m);
+	}
+	
+	public Duration(int tm)
+	{
+		setDuration(tm);
+	}
+	
+	public void setDuration(int h, int m)
+	{
+		h += (int)(m / 60);
+		m %= 60;
+		
+		hours = h;
+		minutes = m;
+	}
+	
+	public void setDuration(int tm)
+	{
+		setDuration((int)(tm / 60), tm % 60);
 	}
 
 	public int getHours()
@@ -16,9 +34,9 @@ public class Duration
 		return hours;
 	}
 
-	public void setHours(int hours)
+	public void setHours(int h)
 	{
-		this.hours = hours;
+		hours = h;
 	}
 
 	public int getMinutes()
@@ -26,9 +44,14 @@ public class Duration
 		return minutes;
 	}
 
-	public void setMinutes(int minutes)
+	public void setMinutes(int m)
 	{
-		this.minutes = minutes;
+		minutes = m;
+	}
+	
+	public int getTotalMinutes()
+	{
+		return (hours * 60) + minutes;
 	}
 	
 	public String formatAsWords()

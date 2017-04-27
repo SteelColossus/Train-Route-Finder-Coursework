@@ -7,8 +7,8 @@ public class Money
 	
 	public Money(int pounds, int pennies)
 	{
-		this.wholePounds = pounds;
-		this.wholePennies = pennies;
+		wholePounds = pounds;
+		wholePennies = pennies;
 	}
 
 	public int getPounds()
@@ -18,7 +18,7 @@ public class Money
 
 	public void setPounds(int pounds)
 	{
-		this.wholePounds = pounds;
+		wholePounds = pounds;
 	}
 
 	public int getPennies()
@@ -28,7 +28,7 @@ public class Money
 
 	public void setPennies(int pennies)
 	{
-		this.wholePennies = pennies;
+		wholePennies = pennies;
 	}
 	
 	public String formatCurrency()

@@ -41,8 +41,8 @@ public class MainMenu
 	
 	public MainMenu(RouteManager rm)
 	{
-		this.manager = rm;
-		this.setup();
+		manager = rm;
+		setup();
 		
 		adminMenu = new AdminMenu(rm);
 	}

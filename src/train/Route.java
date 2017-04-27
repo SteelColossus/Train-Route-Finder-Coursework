@@ -1,6 +1,7 @@
 package train;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Route
@@ -10,20 +11,27 @@ public class Route
 	private Money singlePrice;
 	private Money returnPrice;
 	
-	public Route(Station start, Station end, Duration time, Money singlePrice, Money returnPrice)
+	public Route(Station[] stations, Duration time, Money singlePrice, Money returnPrice)
 	{
-		stations = new ArrayList<Station>();
-		
-		stations.add(start);
-		stations.add(end);
+		this.stations = new ArrayList<Station>(Arrays.asList(stations));
 		this.time = time;
 		this.singlePrice = singlePrice;
 		this.returnPrice = returnPrice;
 	}
 	
+	public Route(Station start, Station end, Duration time, Money singlePrice, Money returnPrice)
+	{
+		this(new Station[]{start, end}, time, singlePrice, returnPrice);
+	}
+	
+	public Route(Station[] stations, int totalMins, int singlePounds, int singlePennies, int returnPounds, int returnPennies)
+	{
+		this(stations, new Duration(totalMins), new Money(singlePounds, singlePennies), new Money(returnPounds, returnPennies));
+	}
+	
 	public Route(Station start, Station end, int totalMins, int singlePounds, int singlePennies, int returnPounds, int returnPennies)
 	{
-		this(start, end, new Duration((int)(totalMins / 60), totalMins % 60), new Money(singlePounds, singlePennies), new Money(returnPounds, returnPennies));
+		this(start, end, new Duration(totalMins), new Money(singlePounds, singlePennies), new Money(returnPounds, returnPennies));
 	}
 	
 	public Station getStation(int index)
@@ -84,5 +92,10 @@ public class Route
 	public Money getReturnPrice()
 	{
 		return returnPrice;
+	}
+	
+	public boolean areSame(Route other)
+	{
+		return (getStartStation().equals(other.getStartStation()) && getEndStation().equals(other.getEndStation()));
 	}
 }
