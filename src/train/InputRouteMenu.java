@@ -1,8 +1,10 @@
 package train;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -12,20 +14,23 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
-@SuppressWarnings("unused")
 public class InputRouteMenu
 {
 	private RouteManager manager;
 
 	private JDialog frame;
-	
+
 	private JPanel stopsPanel;
+	private JPanel endPanel;
+	private JPanel forceMinSizePanel;
 	
 	private JComboBox<String> fromBox;
 	private JComboBox<String> toBox;
 	
-	private ArrayList<JButton> deleteNewButtons;
+	private JButton exitButton; 
+	
 	private ArrayList<JLabel> existingStops;
 	
 	private JPanel newStopPanel;
@@ -40,19 +45,25 @@ public class InputRouteMenu
 	
 	private void setup()
 	{
-		deleteNewButtons = new ArrayList<JButton>();
 		existingStops = new ArrayList<JLabel>();
 		
 		frame = new JDialog();
 		frame.setTitle("Input Route");
 		frame.setSize(200, 200);
-		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+		frame.setMinimumSize(new Dimension(200, 70));
+		frame.setLayout(new BorderLayout(5, 5));
+		frame.getRootPane().setBorder(new EmptyBorder(5, 5, 5, 5));
 		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setModal(true);
 		
 		stopsPanel = new JPanel();
 		stopsPanel.setLayout(new BoxLayout(stopsPanel, BoxLayout.Y_AXIS));
+		
+		endPanel = new JPanel();
+		endPanel.setLayout(new BoxLayout(endPanel, BoxLayout.Y_AXIS));
+		
+		forceMinSizePanel = new JPanel();
 		
 		String[] stationNameList = manager.getAllStations().stream().filter(x -> x.isMain()).map(Station::getName).toArray(String[]::new);
 		
@@ -61,6 +72,8 @@ public class InputRouteMenu
 		
 		fromBox.setSelectedIndex(-1);
 		toBox.setSelectedIndex(-1);
+		
+		exitButton = new JButton("Exit");
 		
 		fromBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
@@ -86,9 +99,21 @@ public class InputRouteMenu
 			}
 		});
 		
-		frame.add(fromBox);
-		frame.add(stopsPanel);
-		frame.add(toBox);
+		exitButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			}
+		});
+		
+		forceMinSizePanel.add(exitButton);
+		
+		endPanel.add(toBox);
+		endPanel.add(forceMinSizePanel);
+		
+		frame.add(fromBox, BorderLayout.PAGE_START);
+		frame.add(stopsPanel, BorderLayout.CENTER);
+		frame.add(endPanel, BorderLayout.PAGE_END);
 		
 		updateStops();
 	}
@@ -109,7 +134,7 @@ public class InputRouteMenu
 		updateStops();
 	}
 	
-	private void updateStops()
+	public void updateStops()
 	{
 		existingStops.clear();
 		stopsPanel.removeAll();
@@ -164,8 +189,8 @@ public class InputRouteMenu
 			
 			stopsPanel.add(newStopPanel);
 		}
-
-		stopsPanel.revalidate();
+		
+		frame.pack();
 	}
 	
 	public void show()

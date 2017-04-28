@@ -8,8 +8,6 @@ public class RouteManager
 	private ArrayList<Station> stations;
 	private ArrayList<Route> routes;
 	
-	private FileManager fmanager;
-	
 	public RouteManager()
 	{
 		setup();
@@ -19,8 +17,6 @@ public class RouteManager
 	{
 		stations = new ArrayList<Station>();
 		routes = new ArrayList<Route>();
-		
-		fmanager = new FileManager();
 		
 		Station leicester = new Station("Leicester", true);
 		Station loughborough = new Station("Loughborough", true);
@@ -146,14 +142,14 @@ public class RouteManager
 		}
 	}
 	
-	public boolean updateFile()
+	public boolean updateFile(String path)
 	{
-		return fmanager.writeToFile(routes);
+		return FileManager.writeToFile(path, routes);
 	}
 	
-	public boolean updateSystem()
+	public boolean updateSystemFromFile(String path)
 	{
-		List<String> lines = fmanager.readFromFile();
+		List<String> lines = FileManager.readFromFile(path);
 		
 		if (lines != null)
 		{

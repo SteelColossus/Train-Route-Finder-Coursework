@@ -1,15 +1,19 @@
 package train;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AdminMenu
 {
@@ -24,6 +28,8 @@ public class AdminMenu
 	private JButton saveButton;
 	private JButton loadButton;
 	private JButton exitButton;
+
+	private JFileChooser fileChooser;
 	
 	public AdminMenu(RouteManager rm)
 	{
@@ -35,15 +41,20 @@ public class AdminMenu
 	
 	private void setup()
 	{
+		fileChooser = new JFileChooser(System.getProperty("user.dir"));
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Train Route Manager Files", "trm"));
+		fileChooser.setSelectedFile(new File("routes.trm"));
+		
 		frame = new JDialog();
 		frame.setTitle("Admin Menu");
 		frame.setSize(200, 200);
-		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setModal(true);
 		
 		buttonPanel = new JPanel(new GridLayout(4, 1, 5, 2));
+		buttonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
 		inputButton = new JButton("Input route");
 		saveButton = new JButton("Save routes");
@@ -60,15 +71,21 @@ public class AdminMenu
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				boolean success = manager.updateFile();
+				int res = fileChooser.showSaveDialog(frame);
 				
-				if (success)
+				if (res == JFileChooser.APPROVE_OPTION)
 				{
-					JOptionPane.showMessageDialog(frame, "The routes were saved successfully.", "Saved successfully", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(frame, "There was an error in saving the routes.", "Save was unsuccessful", JOptionPane.ERROR_MESSAGE);
+					boolean success = manager.updateFile(fileChooser.getSelectedFile().getAbsolutePath());
+					
+					if (success)
+					{
+						JOptionPane.showMessageDialog(frame, "The routes were saved successfully.", "Saved successfully", JOptionPane.INFORMATION_MESSAGE);
+						inputRouteMenu.updateStops();
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(frame, "There was an error in saving the routes.", "Save was unsuccessful", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -76,15 +93,21 @@ public class AdminMenu
 		loadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				boolean success = manager.updateSystem();
+				int res = fileChooser.showOpenDialog(frame);
 				
-				if (success)
+				if (res == JFileChooser.APPROVE_OPTION)
 				{
-					JOptionPane.showMessageDialog(frame, "The current routes were updated successfully.", "Updated successfully", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(frame, "There was an error in updating the current routes.", "Update was unsuccessful", JOptionPane.ERROR_MESSAGE);
+					boolean success = manager.updateSystemFromFile(fileChooser.getSelectedFile().getAbsolutePath());
+					
+					if (success)
+					{
+						JOptionPane.showMessageDialog(frame, "The current routes were updated successfully.", "Updated successfully", JOptionPane.INFORMATION_MESSAGE);
+						inputRouteMenu.updateStops();
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(frame, "There was an error in updating the current routes.", "Update was unsuccessful", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});

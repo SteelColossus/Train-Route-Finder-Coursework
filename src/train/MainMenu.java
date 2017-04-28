@@ -265,23 +265,6 @@ public class MainMenu
 				{
 					toBox.setSelectedIndex(-1);
 				}
-				
-				/*
-				String prevStr = (toBox.getSelectedItem() == null) ? null : toBox.getSelectedItem().toString();
-				
-				toBox.removeAllItems();
-
-				manager.getAllStations().stream().filter(x -> x.isMain() && x.getName() != fromBox.getSelectedItem()).map(Station::getName).forEach(x -> toBox.addItem(x));
-				
-				if (prevStr == null || fromBox.getSelectedItem() == prevStr)
-				{
-					toBox.setSelectedIndex(-1);
-				}
-				else
-				{
-					toBox.setSelectedItem(prevStr);
-				}
-				*/
 			}
 		});
 		
@@ -327,7 +310,7 @@ public class MainMenu
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.PAGE_START;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weighty = 0.0;
 		c.gridx = 0;

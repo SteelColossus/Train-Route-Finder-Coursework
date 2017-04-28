@@ -1,6 +1,5 @@
 package train;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,30 +7,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileManager
-{
-	private File saveFile;
-	
-	public FileManager()
-	{
-		setup();
-	}
-	
-	private void setup()
-	{
-		saveFile = new File("routes.trm");
-	}
-	
-	public boolean fileExists()
-	{
-		return saveFile.isFile();
-	}
-	
-	public boolean writeToFile(ArrayList<Route> routes)
+public final class FileManager
+{	
+	public static boolean writeToFile(String path, ArrayList<Route> routes)
 	{
 		try
 		{
-			FileWriter fw = new FileWriter(saveFile);
+			FileWriter fw = new FileWriter(path);
 			
 			for (Route r : routes)
 			{
@@ -61,11 +43,11 @@ public class FileManager
 		return false;
 	}
 	
-	public List<String> readFromFile()
+	public static List<String> readFromFile(String path)
 	{		
 		try
 		{
-			List<String> lines = Files.readAllLines(Paths.get(saveFile.getAbsolutePath()));
+			List<String> lines = Files.readAllLines(Paths.get(path));
 			
 			return lines;
 		}
