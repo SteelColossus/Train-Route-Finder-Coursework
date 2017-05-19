@@ -55,7 +55,7 @@ public class AdminMenu
 	private void defaultSetup()
 	{
 		fileChooser = new JFileChooser(System.getProperty("user.dir"));
-		fileChooser.setFileFilter(new FileNameExtensionFilter("Train Route Manager Files", "trm"));
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Train Route Manager File (*.trm)", "trm"));
 		fileChooser.setSelectedFile(new File("routes.trm"));
 		
 		frame = new JDialog();
@@ -91,7 +91,28 @@ public class AdminMenu
 				
 				if (res == JFileChooser.APPROVE_OPTION)
 				{
-					boolean success = manager.updateFile(fileChooser.getSelectedFile().getAbsolutePath());
+					String fileName = fileChooser.getSelectedFile().getName();
+					String path = fileChooser.getSelectedFile().getAbsolutePath();
+					
+					if (new File(path).isFile())
+					{
+						int contRes = JOptionPane.showConfirmDialog(frame, "The file name that you are attempting to save the file as already exists. Would you like to overwrite the existing file?", "File already exists", JOptionPane.YES_NO_OPTION);
+						
+						if (contRes != JOptionPane.YES_OPTION) return;
+					}
+					
+					if (!fileName.contains("."))
+					{
+						path += ".trm";
+					}
+					else if (!fileName.contains(".trm"))
+					{
+						int contRes = JOptionPane.showConfirmDialog(frame, "The file type that you are attempting to save the file as appears to be unsupported. Are you sure you wish to continue?", "Unsupported file type", JOptionPane.YES_NO_OPTION);
+						
+						if (contRes != JOptionPane.YES_OPTION) return;
+					}
+					
+					boolean success = manager.updateFile(path);
 					
 					if (success)
 					{
@@ -115,7 +136,17 @@ public class AdminMenu
 				{
 					if (fileChooser.getSelectedFile().exists())
 					{
-						boolean success = manager.updateSystemFromFile(fileChooser.getSelectedFile().getAbsolutePath());
+						String fileName = fileChooser.getSelectedFile().getName();
+						String path = fileChooser.getSelectedFile().getAbsolutePath();
+						
+						if (!fileName.contains(".trm"))
+						{
+							int contRes = JOptionPane.showConfirmDialog(frame, "The file type of the file that you are attempting to open appears to be unsupported. Are you sure you wish to continue?", "Unsupported file type", JOptionPane.YES_NO_OPTION);
+							
+							if (contRes != JOptionPane.YES_OPTION) return;
+						}
+						
+						boolean success = manager.updateSystemFromFile(path);
 						
 						if (success)
 						{

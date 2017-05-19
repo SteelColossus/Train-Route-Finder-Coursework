@@ -65,7 +65,15 @@ public final class FileManager
 			
 			for (String routeStr : Files.readAllLines(Paths.get(path)))
 			{
-				String stationsStr = routeStr.substring(routeStr.indexOf("[") + 1, routeStr.indexOf("]"));
+				int startIndex = routeStr.indexOf("[");
+				int finalIndex = routeStr.indexOf("]");
+				
+				if (startIndex == -1 || finalIndex == -1 || startIndex >= finalIndex || routeStr.chars().filter(c -> c == ',').count() < 5)
+				{
+					return null;
+				}
+				
+				String stationsStr = routeStr.substring(startIndex + 1, finalIndex);
 				String[] stationStrArray = stationsStr.split(",");
 				Station[] stationArray = new Station[stationStrArray.length];
 				
@@ -75,14 +83,7 @@ public final class FileManager
 				{
 					boolean isMain = (stationStr.indexOf("|m") != -1);
 					
-					if (isMain)
-					{
-						stationArray[snum] = new Station(stationStr.substring(0, stationStr.length() - "|m".length()), true);
-					}
-					else
-					{
-						stationArray[snum] = new Station(stationStr, false);
-					}
+					stationArray[snum] = new Station(stationStr.substring(0, stationStr.length() - ((isMain) ? "|m".length() : 0)).trim(), isMain);
 					
 					snum++;
 				}

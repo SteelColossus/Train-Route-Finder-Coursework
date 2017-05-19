@@ -151,7 +151,7 @@ public class InputRouteMenu
 	{
 		String newStopText = newStop.getText();
 		
-		if (newStopText != null && newStopText.trim().length() > 0)
+		if (newStopText != null && newStopText.matches("[A-Za-z][A-Za-z&\\- ]*"))
 		{
 			Station s = manager.addStation(newStopText, false);
 			Route r = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());

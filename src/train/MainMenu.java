@@ -3,7 +3,7 @@ package train;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 import javax.swing.*;
@@ -18,7 +18,6 @@ public class MainMenu
 	private RouteManager manager;
 	private AdminMenu adminMenu;
 	
-	// Form components
 	private JFrame frame;
 	
 	private JPanel flowButtonPanel;
@@ -45,12 +44,17 @@ public class MainMenu
 	private JComboBox<String> fromBox;
 	private JComboBox<String> toBox;
 	
+	private boolean sortAlphabetical;
+	private boolean routesShownLast;
+	
 	/**
 	 * Constructor taking a route manager.
 	 * @param rm	a route manager which stores all the routes managed by this system
 	 */
 	public MainMenu(RouteManager rm)
 	{
+		sortAlphabetical = false;
+		routesShownLast = false;
 		manager = rm;
 		defaultSetup();
 		
@@ -70,6 +74,50 @@ public class MainMenu
 		else
 		{
 			return null;
+		}
+	}
+	
+	/**
+	 * Updates the stops for the current route.
+	 */
+	private void updateStops()
+	{
+		Route currentRoute = getCurrentRoute();
+		
+		if (currentRoute != null)
+		{					
+			ArrayList<String> routeNames = new ArrayList<String>(currentRoute.getNumStops());
+			
+			for (int i = 0; i < currentRoute.getNumStops(); i++)
+			{
+				routeNames.add(currentRoute.getStop(i).getName());
+			}
+			
+			if (routeNames.size() > 0)
+			{
+				StringBuilder routeStr = new StringBuilder();
+				
+				int j = 0;
+				
+				if (sortAlphabetical) Collections.sort(routeNames);
+				
+				for (String routeName : routeNames)
+				{
+					routeStr.append(routeName);
+					if (j < currentRoute.getNumStops() - 1) routeStr.append(", ");
+					j++;
+				}
+				
+				infoLabel.setText("<html>Stops: " + routeStr + "<br><br>Sorted " + ((sortAlphabetical) ? "alphabetically" : "in order") + "</html>");
+			}
+			else
+			{
+				infoLabel.setText("There are no stops for this route.");
+			}
+		}
+		else
+		{
+			infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
 		}
 	}
 	
@@ -152,10 +200,11 @@ public class MainMenu
 		infoLabel = new JLabel();
 		infoLabel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		
-		// Action listeners
 		timeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				routesShownLast = false;
+				
 				Route currentRoute = getCurrentRoute();
 				
 				if (currentRoute != null)
@@ -164,7 +213,7 @@ public class MainMenu
 				}
 				else
 				{
-					infoLabel.setText("Please enter a valid route.");
+					infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
 				}
 			}
 		});
@@ -172,6 +221,8 @@ public class MainMenu
 		priceButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				routesShownLast = false;
+				
 				Route currentRoute = getCurrentRoute();
 				
 				if (currentRoute != null)
@@ -181,24 +232,21 @@ public class MainMenu
 					Money singlePrice = new Money(currentRoute.getSinglePrice().getPounds(), currentRoute.getSinglePrice().getPennies());
 					Money returnPrice = new Money(currentRoute.getReturnPrice().getPounds(), currentRoute.getReturnPrice().getPennies());
 					
-					priceStr += "<html>" + "Single price: " + singlePrice.formatCurrency() + "<br>";
-					priceStr += "Return price: " + returnPrice.formatCurrency();
-					
 					if (dayBox.getSelectedIndex() == dayBox.getItemCount() - 1)
 					{
 						int discount = 10;
 						
 						singlePrice.applyDiscount(discount);
 						returnPrice.applyDiscount(discount);
-						priceStr += "<br>" + "By travelling on the last day of the month,<br>you receive a " + discount + "% discount!";
+						priceStr = "<br>" + "By travelling on the last day of the month,<br>you receive a " + discount + "% discount!";
 					}
 					
-					priceStr += "</html>";
+					priceStr = ("<html>" + "Single price: " + singlePrice.formatCurrency() + "<br>" + "Return price: " + returnPrice.formatCurrency()) + priceStr + "</html>";
 					infoLabel.setText(priceStr);
 				}
 				else
 				{
-					infoLabel.setText("Please enter a valid route.");
+					infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
 				}
 			}
 		});
@@ -206,40 +254,29 @@ public class MainMenu
 		routeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				Route currentRoute = getCurrentRoute();
+				routesShownLast = true;
+				sortAlphabetical = false;
 				
-				if (currentRoute != null)
-				{
-					String routeStr = "";
-					
-					for (int i = 0; i < currentRoute.getNumStations(); i++)
-					{
-						routeStr += currentRoute.getStation(i).getName();
-						if (i < currentRoute.getNumStations() - 1) routeStr += " -> ";
-					}
-					
-					infoLabel.setText("Route: " + routeStr);
-				}
-				else
-				{
-					infoLabel.setText("Please enter a valid route.");
-				}
+				updateStops();
 			}
 		});
 		
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				// Yes this is all terrible
-				if (infoLabel.getText().contains("Route:"))
+				if (routesShownLast)
 				{
-					String[] stationStrings = infoLabel.getText().substring("Route: ".length()).split(" -> ");
-					Arrays.sort(stationStrings);
-					infoLabel.setText("Sorted route: " + String.join(", ", stationStrings));
+					Route currentRoute = getCurrentRoute();
+					
+					if (currentRoute != null && currentRoute.getNumStops() > 0)
+					{
+						sortAlphabetical = !sortAlphabetical;
+						updateStops();
+					}
 				}
-				else if (!infoLabel.getText().contains("Sorted route:"))
+				else
 				{
-					infoLabel.setText("Please select the \"Route\" option first.");
+					infoLabel.setText("You must press the route button first.");
 				}
 			}
 		});
@@ -260,7 +297,7 @@ public class MainMenu
 		
 		monthBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
-			{
+			{				
 				int endDay;
 				int prevIndex = dayBox.getSelectedIndex();
 				
@@ -303,6 +340,8 @@ public class MainMenu
 		toBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				routesShownLast = false;
+				
 				if (fromBox.getSelectedItem() == toBox.getSelectedItem())
 				{
 					fromBox.setSelectedIndex(-1);
