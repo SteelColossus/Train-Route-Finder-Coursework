@@ -2,11 +2,17 @@ package train;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * The main menu that the program displays when it loads up.
+ * @author Michael
+ */
 public class MainMenu
 {
 	private RouteManager manager;
@@ -39,15 +45,38 @@ public class MainMenu
 	private JComboBox<String> fromBox;
 	private JComboBox<String> toBox;
 	
+	/**
+	 * Constructor taking a route manager.
+	 * @param rm	a route manager which stores all the routes managed by this system
+	 */
 	public MainMenu(RouteManager rm)
 	{
 		manager = rm;
-		setup();
+		defaultSetup();
 		
 		adminMenu = new AdminMenu(rm);
 	}
 	
-	private void setup()
+	/**
+	 * Gets the current route that the user has selected.
+	 * @return	the route the user has selected
+	 */
+	private Route getCurrentRoute()
+	{
+		if (monthBox.getSelectedIndex() > -1 && dayBox.getSelectedIndex() > -1 && fromBox.getSelectedIndex() > -1 && toBox.getSelectedIndex() > -1)
+		{
+			return manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
+	 * Sets up the frame to display.
+	 */
+	private void defaultSetup()
 	{
 		frame = new JFrame();
 		frame.setTitle("Train Route Finder");
@@ -55,6 +84,9 @@ public class MainMenu
 		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setResizable(false);
+		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation((screenSize.width / 2) - (frame.getSize().width / 2), (screenSize.height / 2) - (frame.getSize().height / 2));
 
 		flowButtonPanel = new JPanel();
 		buttonPanel = new JPanel();
@@ -91,15 +123,25 @@ public class MainMenu
 		monthBox.setPreferredSize(new Dimension(50, monthBox.getMinimumSize().height));
 		dayBox.setPreferredSize(new Dimension(50, dayBox.getMinimumSize().height));
 		
-		String[] stationNameList = manager.getAllStations().stream().filter(x -> x.isMain()).map(Station::getName).toArray(String[]::new);
+		ArrayList<String> stationNameList = new ArrayList<String>();
+		
+		for (int i = 0; i < manager.getNumStations(); i++)
+		{
+			Station s = manager.getStation(i);
+			
+			if (s.isMain() && !stationNameList.contains(s))
+			{
+				stationNameList.add(s.getName());
+			}
+		}
 		
 		stationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
 		
 		fromLabel = new JLabel("From:");
 		toLabel = new JLabel("To:");
 		
-		fromBox = new JComboBox<String>(stationNameList);		
-		toBox = new JComboBox<String>(stationNameList);
+		fromBox = new JComboBox<String>(stationNameList.toArray(new String[0]));		
+		toBox = new JComboBox<String>(stationNameList.toArray(new String[0]));
 		
 		fromBox.setSelectedIndex(-1);
 		toBox.setSelectedIndex(-1);
@@ -114,22 +156,15 @@ public class MainMenu
 		timeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				if (monthBox.getSelectedIndex() > -1 && dayBox.getSelectedIndex() > -1 && fromBox.getSelectedIndex() > -1 && toBox.getSelectedIndex() > -1)
+				Route currentRoute = getCurrentRoute();
+				
+				if (currentRoute != null)
 				{
-					Route currentRoute = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
-					
-					if (currentRoute != null)
-					{
-						infoLabel.setText("Time taken: " + currentRoute.getDuration().formatAsWords());
-					}
-					else
-					{
-						infoLabel.setText("Please enter a valid route.");
-					}
+					infoLabel.setText("Time taken: " + currentRoute.getDuration().formatAsWords());
 				}
 				else
 				{
-					infoLabel.setText("<html>Please enter a valid departure date,<br>origin station and destination station.</html>");
+					infoLabel.setText("Please enter a valid route.");
 				}
 			}
 		});
@@ -137,40 +172,33 @@ public class MainMenu
 		priceButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				if (monthBox.getSelectedIndex() > -1 && dayBox.getSelectedIndex() > -1 && fromBox.getSelectedIndex() > -1 && toBox.getSelectedIndex() > -1)
+				Route currentRoute = getCurrentRoute();
+				
+				if (currentRoute != null)
 				{
-					Route currentRoute = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
+					String priceStr = "";
 					
-					if (currentRoute != null)
+					Money singlePrice = new Money(currentRoute.getSinglePrice().getPounds(), currentRoute.getSinglePrice().getPennies());
+					Money returnPrice = new Money(currentRoute.getReturnPrice().getPounds(), currentRoute.getReturnPrice().getPennies());
+					
+					priceStr += "<html>" + "Single price: " + singlePrice.formatCurrency() + "<br>";
+					priceStr += "Return price: " + returnPrice.formatCurrency();
+					
+					if (dayBox.getSelectedIndex() == dayBox.getItemCount() - 1)
 					{
-						String priceStr = "";
+						int discount = 10;
 						
-						Money singlePrice = new Money(currentRoute.getSinglePrice().getPounds(), currentRoute.getSinglePrice().getPennies());
-						Money returnPrice = new Money(currentRoute.getReturnPrice().getPounds(), currentRoute.getReturnPrice().getPennies());
-						
-						priceStr += "<html>" + "Single price: " + singlePrice.formatCurrency() + "<br>";
-						priceStr += "Return price: " + returnPrice.formatCurrency();
-						
-						if (dayBox.getSelectedIndex() == dayBox.getItemCount() - 1)
-						{
-							int discount = 10;
-							
-							singlePrice.applyDiscount(discount);
-							returnPrice.applyDiscount(discount);
-							priceStr += "<br>" + "By travelling on the last day of the month,<br>you receive a " + discount + "% discount!";
-						}
-						
-						priceStr += "</html>";
-						infoLabel.setText(priceStr);
+						singlePrice.applyDiscount(discount);
+						returnPrice.applyDiscount(discount);
+						priceStr += "<br>" + "By travelling on the last day of the month,<br>you receive a " + discount + "% discount!";
 					}
-					else
-					{
-						infoLabel.setText("Please enter a valid route.");
-					}
+					
+					priceStr += "</html>";
+					infoLabel.setText(priceStr);
 				}
 				else
 				{
-					infoLabel.setText("<html>Please enter a valid departure date,<br>origin station and destination station.</html>");
+					infoLabel.setText("Please enter a valid route.");
 				}
 			}
 		});
@@ -178,30 +206,23 @@ public class MainMenu
 		routeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				if (monthBox.getSelectedIndex() > -1 && dayBox.getSelectedIndex() > -1 && fromBox.getSelectedIndex() > -1 && toBox.getSelectedIndex() > -1)
+				Route currentRoute = getCurrentRoute();
+				
+				if (currentRoute != null)
 				{
-					Route currentRoute = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
+					String routeStr = "";
 					
-					if (currentRoute != null)
+					for (int i = 0; i < currentRoute.getNumStations(); i++)
 					{
-						String routeStr = "";
-						
-						for (int i = 0; i < currentRoute.getNumStations(); i++)
-						{
-							routeStr += currentRoute.getStation(i).getName();
-							if (i < currentRoute.getNumStations() - 1) routeStr += " -> ";
-						}
-						
-						infoLabel.setText("Route: " + routeStr);
+						routeStr += currentRoute.getStation(i).getName();
+						if (i < currentRoute.getNumStations() - 1) routeStr += " -> ";
 					}
-					else
-					{
-						infoLabel.setText("Please enter a valid route.");
-					}
+					
+					infoLabel.setText("Route: " + routeStr);
 				}
 				else
 				{
-					infoLabel.setText("<html>Please enter a valid departure date,<br>origin station and destination station.</html>");
+					infoLabel.setText("Please enter a valid route.");
 				}
 			}
 		});
@@ -209,6 +230,17 @@ public class MainMenu
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				// Yes this is all terrible
+				if (infoLabel.getText().contains("Route:"))
+				{
+					String[] stationStrings = infoLabel.getText().substring("Route: ".length()).split(" -> ");
+					Arrays.sort(stationStrings);
+					infoLabel.setText("Sorted route: " + String.join(", ", stationStrings));
+				}
+				else if (!infoLabel.getText().contains("Sorted route:"))
+				{
+					infoLabel.setText("Please select the \"Route\" option first.");
+				}
 			}
 		});
 		
@@ -333,11 +365,17 @@ public class MainMenu
 		frame.add(contentPanel);
 	}
 	
+	/**
+	 * Shows the frame.
+	 */
 	public void show()
 	{
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Hides the frame.
+	 */
 	public void hide()
 	{
 		frame.setVisible(false);

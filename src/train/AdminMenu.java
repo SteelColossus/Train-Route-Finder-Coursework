@@ -1,7 +1,9 @@
 package train;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -15,6 +17,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * The admin menu that is used for administrator functions.
+ * @author Michael
+ */
 public class AdminMenu
 {
 	private RouteManager manager;
@@ -31,15 +37,22 @@ public class AdminMenu
 
 	private JFileChooser fileChooser;
 	
+	/**
+	 * Constructor taking a route manager.
+	 * @param rm	a route manager which stores all the routes managed by this system
+	 */
 	public AdminMenu(RouteManager rm)
 	{
 		manager = rm;
-		setup();
+		defaultSetup();
 		
 		inputRouteMenu = new InputRouteMenu(rm);
 	}
 	
-	private void setup()
+	/**
+	 * Sets up the file chooser and frame to display.
+	 */
+	private void defaultSetup()
 	{
 		fileChooser = new JFileChooser(System.getProperty("user.dir"));
 		fileChooser.setFileFilter(new FileNameExtensionFilter("Train Route Manager Files", "trm"));
@@ -52,6 +65,9 @@ public class AdminMenu
 		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setModal(true);
+		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation((screenSize.width / 2) - (frame.getSize().width / 2), (screenSize.height / 2) - (frame.getSize().height / 2));
 		
 		buttonPanel = new JPanel(new GridLayout(4, 1, 5, 2));
 		buttonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -97,16 +113,23 @@ public class AdminMenu
 				
 				if (res == JFileChooser.APPROVE_OPTION)
 				{
-					boolean success = manager.updateSystemFromFile(fileChooser.getSelectedFile().getAbsolutePath());
-					
-					if (success)
+					if (fileChooser.getSelectedFile().exists())
 					{
-						JOptionPane.showMessageDialog(frame, "The current routes were updated successfully.", "Updated successfully", JOptionPane.INFORMATION_MESSAGE);
-						inputRouteMenu.updateStops();
+						boolean success = manager.updateSystemFromFile(fileChooser.getSelectedFile().getAbsolutePath());
+						
+						if (success)
+						{
+							JOptionPane.showMessageDialog(frame, "The current routes were updated successfully.", "Updated successfully", JOptionPane.INFORMATION_MESSAGE);
+							inputRouteMenu.updateStops();
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(frame, "There was an error in updating the current routes.", "Update was unsuccessful", JOptionPane.ERROR_MESSAGE);
+						}
 					}
 					else
 					{
-						JOptionPane.showMessageDialog(frame, "There was an error in updating the current routes.", "Update was unsuccessful", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(frame, "The selected file does not exist.", "File opening was unsuccessful", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			}
@@ -127,11 +150,17 @@ public class AdminMenu
 		frame.add(buttonPanel);
 	}
 
+	/**
+	 * Shows the frame.
+	 */
 	public void show()
 	{
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Hides the frame.
+	 */
 	public void hide()
 	{
 		frame.setVisible(false);

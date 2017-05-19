@@ -2,6 +2,7 @@ package train;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -12,10 +13,15 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * The menu that is used for inputting and deleting routes in the system.
+ * @author Michael
+ */
 public class InputRouteMenu
 {
 	private RouteManager manager;
@@ -37,16 +43,23 @@ public class InputRouteMenu
 	private JTextField newStop;
 	private JButton addButton;
 	
+	/**
+	 * Constructor taking a route manager.
+	 * @param rm	a route manager which stores all the routes managed by this system
+	 */
 	public InputRouteMenu(RouteManager rm)
 	{
 		manager = rm;
-		setup();
-	}
-	
-	private void setup()
-	{
 		existingStops = new ArrayList<JLabel>();
 		
+		defaultSetup();
+	}
+	
+	/**
+	 * Sets up the frame to display.
+	 */
+	private void defaultSetup()
+	{
 		frame = new JDialog();
 		frame.setTitle("Input Route");
 		frame.setSize(200, 200);
@@ -57,6 +70,9 @@ public class InputRouteMenu
 		frame.setResizable(false);
 		frame.setModal(true);
 		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation((screenSize.width / 2) - (frame.getSize().width / 2), (screenSize.height / 2) - (frame.getSize().height / 2));
+		
 		stopsPanel = new JPanel();
 		stopsPanel.setLayout(new BoxLayout(stopsPanel, BoxLayout.Y_AXIS));
 		
@@ -65,10 +81,20 @@ public class InputRouteMenu
 		
 		forceMinSizePanel = new JPanel();
 		
-		String[] stationNameList = manager.getAllStations().stream().filter(x -> x.isMain()).map(Station::getName).toArray(String[]::new);
+		ArrayList<String> stationNameList = new ArrayList<String>();
 		
-		fromBox = new JComboBox<String>(stationNameList);		
-		toBox = new JComboBox<String>(stationNameList);
+		for (int i = 0; i < manager.getNumStations(); i++)
+		{
+			Station s = manager.getStation(i);
+			
+			if (s.isMain() && !stationNameList.contains(s))
+			{
+				stationNameList.add(s.getName());
+			}
+		}
+		
+		fromBox = new JComboBox<String>(stationNameList.toArray(new String[0]));		
+		toBox = new JComboBox<String>(stationNameList.toArray(new String[0]));
 		
 		fromBox.setSelectedIndex(-1);
 		toBox.setSelectedIndex(-1);
@@ -118,22 +144,40 @@ public class InputRouteMenu
 		updateStops();
 	}
 	
+	/**
+	 * Adds a new stop to the system.
+	 */
 	private void addNewStop()
 	{
-		Station s = manager.addStation(newStop.getText(), false);
-		Route r = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
-		manager.addRouteStop(r, s);
-		updateStops();
+		String newStopText = newStop.getText();
+		
+		if (newStopText != null && newStopText.trim().length() > 0)
+		{
+			Station s = manager.addStation(newStopText, false);
+			Route r = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
+			manager.addRouteStop(r, s);
+			updateStops();
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(frame, "Please enter a valid name for this station.", "Invalid station name", JOptionPane.WARNING_MESSAGE);
+		}
 	}
 	
-	private void removeCurrentStop()
+	/**
+	 * Removes an existing stop from the system.
+	 * @param stopNum	the number of the stop to remove
+	 */
+	private void removeStop(int stopNum)
 	{
 		Route currentRoute = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
-		Station s = manager.getStation(existingStops.get(currentRoute.getNumStops() - 1).getText());
-		currentRoute.removeStation(s);
+		currentRoute.removeStation(stopNum + 1);
 		updateStops();
 	}
 	
+	/**
+	 * Updates the GUI to show all the stops for this route.
+	 */
 	public void updateStops()
 	{
 		existingStops.clear();
@@ -154,10 +198,12 @@ public class InputRouteMenu
 					deleteButton.setPreferredSize(new Dimension(deleteButton.getPreferredSize().width, 25));		
 					currentStop.setText(currentRoute.getStop(i).getName());
 					
+					final int stopNum = i;
+					
 					deleteButton.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e)
 						{
-							removeCurrentStop();
+							removeStop(stopNum);
 						}
 					});
 					
@@ -168,36 +214,42 @@ public class InputRouteMenu
 					
 					stopsPanel.add(currentStopPanel);
 				}
+				
+				newStopPanel = new JPanel();
+				newStop = new JTextField();
+				addButton = new JButton("+");
+				
+				newStop.setPreferredSize(new Dimension(100, newStop.getPreferredSize().height));
+				addButton.setPreferredSize(new Dimension(addButton.getPreferredSize().width, 25));
+				
+				addButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e)
+					{
+						addNewStop();
+					}
+				});
+				
+				newStopPanel.add(newStop);
+				newStopPanel.add(addButton);
+				
+				stopsPanel.add(newStopPanel);
 			}
-			
-			newStopPanel = new JPanel();
-			newStop = new JTextField();
-			addButton = new JButton("+");
-			
-			newStop.setPreferredSize(new Dimension(100, newStop.getPreferredSize().height));
-			addButton.setPreferredSize(new Dimension(addButton.getPreferredSize().width, 25));
-			
-			addButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e)
-				{
-					addNewStop();
-				}
-			});
-			
-			newStopPanel.add(newStop);
-			newStopPanel.add(addButton);
-			
-			stopsPanel.add(newStopPanel);
 		}
 		
 		frame.pack();
 	}
 	
+	/**
+	 * Shows the frame.
+	 */
 	public void show()
 	{
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Hides the frame.
+	 */
 	public void hide()
 	{
 		frame.setVisible(false);

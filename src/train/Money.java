@@ -1,36 +1,65 @@
 package train;
 
+/**
+ * An object which stores an amount of money in pounds and pennies.
+ * @author Michael
+ */
 public class Money
 {
 	private int wholePounds;
 	private int wholePennies;
 	
+	/**
+	 * Constructor taking separate pounds and pennies.
+	 * @param pounds
+	 * @param pennies
+	 */
 	public Money(int pounds, int pennies)
 	{
 		wholePounds = pounds;
 		wholePennies = pennies;
 	}
 
+	/**
+	 * Gets the number of whole pounds.
+	 * @return	number of whole pounds
+	 */
 	public int getPounds()
 	{
 		return wholePounds;
 	}
 
+	/**
+	 * Sets the number of whole pounds.
+	 * @param pounds	number of whole pounds
+	 */
 	public void setPounds(int pounds)
 	{
 		wholePounds = pounds;
 	}
 
+	/**
+	 * Gets the number of whole pennies.
+	 * @return	number of whole pennies
+	 */
 	public int getPennies()
 	{
 		return wholePennies;
 	}
 
+	/**
+	 * Sets the number of whole pennies.
+	 * @param pennies	number of whole pennies
+	 */
 	public void setPennies(int pennies)
 	{
 		wholePennies = pennies;
 	}
 	
+	/**
+	 * Formats the money as a string.
+	 * @return	the money as a formatted string
+	 */
 	public String formatCurrency()
 	{
 		String moneyStr = "";
@@ -51,6 +80,10 @@ public class Money
 		return moneyStr;
 	}
 	
+	/**
+	 * Applies a discount of a given percent to this money object.
+	 * @param percent	the percentage discount to apply
+	 */
 	public void applyDiscount(int percent)
 	{
 		int totalPennies = (wholePounds * 100 + wholePennies);

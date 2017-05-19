@@ -8,6 +8,9 @@
 *.ctxt
 *.bluej
 
+# Object UML Diagram Files
+*.ucls
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
