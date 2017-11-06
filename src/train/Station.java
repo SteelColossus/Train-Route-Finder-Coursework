@@ -3,7 +3,7 @@ package train;
 /**
  * An object representing a station.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class Station
 {

@@ -3,7 +3,7 @@ package train;
 /**
  * An object which stores a length of time.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class Duration
 {

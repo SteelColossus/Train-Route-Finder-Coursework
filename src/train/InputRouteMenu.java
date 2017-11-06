@@ -21,7 +21,7 @@ import javax.swing.border.EmptyBorder;
 /**
  * The menu that is used for inputting and deleting routes in the system.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class InputRouteMenu
 {

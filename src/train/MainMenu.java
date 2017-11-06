@@ -27,7 +27,7 @@ import javax.swing.border.EmptyBorder;
 /**
  * The main menu that the program displays when it loads up.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class MainMenu
 {

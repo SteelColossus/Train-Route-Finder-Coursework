@@ -6,7 +6,7 @@ import java.util.Arrays;
 /**
  * An object representing a route that contains many stations.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class Route
 {

@@ -3,7 +3,7 @@ package train;
 /**
  * An object which stores an amount of money in pounds and pennies.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class Money
 {

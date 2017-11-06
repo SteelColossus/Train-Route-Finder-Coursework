@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * An object which stores all the current stations and routes.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class RouteManager
 {

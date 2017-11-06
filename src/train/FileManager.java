@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * A helper class which saves and loads to/from files.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public final class FileManager
 {

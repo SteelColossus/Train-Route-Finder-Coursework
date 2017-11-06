@@ -20,7 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  * The admin menu that is used for administrator functions.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class AdminMenu
 {

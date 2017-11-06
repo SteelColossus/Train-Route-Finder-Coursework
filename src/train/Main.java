@@ -3,7 +3,7 @@ package train;
 /**
  * The main class.
  * 
- * @author Michael
+ * @author SteelColossus
  */
 public class Main
 {
