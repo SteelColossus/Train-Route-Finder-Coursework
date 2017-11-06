@@ -8,7 +8,7 @@ This is my coursework for the Object Oriented Programming module.
 
 To run via the file explorer program:
 
-3. Double click on the trf.jar file. The program should open up.
+3. Double click on the `trf.jar` file. The program should open up.
 
 To run via the command line:
 
@@ -17,10 +17,10 @@ To run via the command line:
 
 To run the .jar file:
 
-5. Use the command "trf.jar".
+5. Use the command `trf.jar`.
 
 To run the class files:
 
-5. Use the command "java -classpath bin train.Main".
+5. Use the command `java -classpath bin train.Main`.
 
 This last step assumes that you have Java added to your PATH.
