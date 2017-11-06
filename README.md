@@ -1,6 +1,7 @@
-This is the README file for the Train Route Finder.
+# Train Route Finder Coursework
+This is my coursework for the Object Oriented Programming module.
 
-To launch the program:
+##Launching the program
 
 1. Unzip the provided folder to a location of your choice.
 2. Make sure that you have the latest version of Java installed. It can be downloaded from here: https://java.com/en/download/
