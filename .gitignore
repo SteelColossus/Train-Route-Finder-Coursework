@@ -8,9 +8,6 @@
 *.ctxt
 *.bluej
 
-# Object UML Diagram Files
-*.ucls
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -24,6 +21,8 @@
 
 # Eclipse Preferences
 *.prefs
+.classpath
+.project
 
 # Train Route Manager savefiles
 *.trm
