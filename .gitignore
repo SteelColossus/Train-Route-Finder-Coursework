@@ -24,6 +24,10 @@
 .classpath
 .project
 
+# IntelliJ Preferences
+.idea/workspace.xml
+.idea/tasks.xml
+
 # Train Route Manager savefiles
 *.trm
 

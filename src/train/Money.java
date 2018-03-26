@@ -73,7 +73,7 @@ public class Money
 
         if (wholePounds > 0)
         {
-            moneyStr += "£" + Integer.toString(wholePounds) + ".";
+            moneyStr += "Â£" + Integer.toString(wholePounds) + ".";
 
             if (wholePennies < 10) moneyStr += "0";
 
