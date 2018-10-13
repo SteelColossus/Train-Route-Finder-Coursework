@@ -39,7 +39,7 @@ public class Duration
      */
     public void setDuration(int h, int m)
     {
-        h += (int) (m / 60);
+        h += m / 60;
         m %= 60;
 
         hours = h;
@@ -53,7 +53,7 @@ public class Duration
      */
     public void setDuration(int tm)
     {
-        setDuration((int) (tm / 60), tm % 60);
+        setDuration((tm / 60), tm % 60);
     }
 
     /**
@@ -69,7 +69,7 @@ public class Duration
     /**
      * Sets the number of whole hours.
      * 
-     * @param number of whole hours
+     * @param h number of whole hours
      */
     public void setHours(int h)
     {

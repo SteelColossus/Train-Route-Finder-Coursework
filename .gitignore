@@ -1,32 +1,40 @@
-# Compiled class file
+# Java
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-*.bluej
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.ear
-*.zip
-*.tar.gz
-*.rar
 
-# Eclipse Preferences
-*.prefs
-.classpath
+# Eclipse
 .project
+.classpath
+.settings
 
-# IntelliJ Preferences
-.idea/workspace.xml
-.idea/tasks.xml
+# Idea
+.idea
+*.iml
+*.iws
+*.ipr
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Gradle
+.gradle
+!gradle-wrapper.jar
+
+# Maven
+target
+
+# Build
+out
+build
+bin
+
+# Other
+*.log
+*.swp
+*.bak
 
 # Train Route Manager savefiles
 *.trm

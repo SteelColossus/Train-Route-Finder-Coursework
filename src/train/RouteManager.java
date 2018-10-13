@@ -17,8 +17,8 @@ public class RouteManager
      */
     public RouteManager()
     {
-        stations = new ArrayList<Station>();
-        routes = new ArrayList<Route>();
+        stations = new ArrayList<>();
+        routes = new ArrayList<>();
 
         defaultSetup();
     }
@@ -120,7 +120,7 @@ public class RouteManager
     public Route getRoute(Station start, Station end)
     {
         return routes.stream().filter(x -> x.getStartStation().areSame(start) && x.getEndStation().areSame(end))
-                     .findFirst().orElse(null);
+                .findFirst().orElse(null);
     }
 
     /**
@@ -144,7 +144,7 @@ public class RouteManager
      */
     public Station addStation(Station s)
     {
-        if (!stations.stream().anyMatch(x -> x.areSame(s)))
+        if (stations.stream().noneMatch(x -> x.areSame(s)))
         {
             stations.add(s);
         }
@@ -191,7 +191,7 @@ public class RouteManager
             addStation(r.getStation(i));
         }
 
-        if (!routes.stream().anyMatch(x -> x.areSame(r)))
+        if (routes.stream().noneMatch(x -> x.areSame(r)))
         {
             routes.add(r);
         }
@@ -218,8 +218,8 @@ public class RouteManager
     public Route addRoute(Station start, Station end, int totalMins, int singlePounds, int singlePennies,
                           int returnPounds, int returnPennies)
     {
-        return addRoute(start, end, new Duration((int) (totalMins / 60), totalMins % 60),
-                        new Money(singlePounds, singlePennies), new Money(returnPounds, returnPennies));
+        return addRoute(start, end, new Duration((totalMins / 60), totalMins % 60),
+                new Money(singlePounds, singlePennies), new Money(returnPounds, returnPennies));
     }
 
     /**

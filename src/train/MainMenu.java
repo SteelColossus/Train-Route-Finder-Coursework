@@ -86,8 +86,8 @@ public class MainMenu
      */
     private Route getCurrentRoute()
     {
-        if (monthBox.getSelectedIndex() > -1 && dayBox.getSelectedIndex() > -1 && fromBox.getSelectedIndex() > -1
-            && toBox.getSelectedIndex() > -1)
+        if (monthBox.getSelectedIndex() > -1 && dayBox.getSelectedIndex() > -1 &&
+                fromBox.getSelectedIndex() > -1 && toBox.getSelectedIndex() > -1)
         {
             return manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
         }
@@ -106,7 +106,7 @@ public class MainMenu
 
         if (currentRoute != null)
         {
-            ArrayList<String> routeNames = new ArrayList<String>(currentRoute.getNumStops());
+            ArrayList<String> routeNames = new ArrayList<>(currentRoute.getNumStops());
 
             for (int i = 0; i < currentRoute.getNumStops(); i++)
             {
@@ -128,8 +128,8 @@ public class MainMenu
                     j++;
                 }
 
-                infoLabel.setText("<html>Stops: " + routeStr + "<br><br>Sorted "
-                                  + ((sortAlphabetical) ? "alphabetically" : "in order") + "</html>");
+                infoLabel.setText("<html>Stops: " + routeStr + "<br><br>Sorted " +
+                        ((sortAlphabetical) ? "alphabetically" : "in order") + "</html>");
             }
             else
             {
@@ -181,9 +181,8 @@ public class MainMenu
         monthLabel = new JLabel("Month:");
         dayLabel = new JLabel("Day:");
 
-        monthBox = new JComboBox<String>(IntStream.rangeClosed(1, 12).mapToObj(Integer::toString)
-                                                  .toArray(String[]::new));
-        dayBox = new JComboBox<String>();
+        monthBox = new JComboBox<>(IntStream.rangeClosed(1, 12).mapToObj(Integer::toString).toArray(String[]::new));
+        dayBox = new JComboBox<>();
 
         monthBox.setSelectedIndex(-1);
         dayBox.setSelectedIndex(-1);
@@ -194,7 +193,7 @@ public class MainMenu
         monthBox.setPreferredSize(new Dimension(50, monthBox.getMinimumSize().height));
         dayBox.setPreferredSize(new Dimension(50, dayBox.getMinimumSize().height));
 
-        ArrayList<String> stationNameList = new ArrayList<String>();
+        ArrayList<String> stationNameList = new ArrayList<>();
 
         for (int i = 0; i < manager.getNumStations(); i++)
         {
@@ -211,8 +210,8 @@ public class MainMenu
         fromLabel = new JLabel("From:");
         toLabel = new JLabel("To:");
 
-        fromBox = new JComboBox<String>(stationNameList.toArray(new String[0]));
-        toBox = new JComboBox<String>(stationNameList.toArray(new String[0]));
+        fromBox = new JComboBox<>(stationNameList.toArray(new String[0]));
+        toBox = new JComboBox<>(stationNameList.toArray(new String[0]));
 
         fromBox.setSelectedIndex(-1);
         toBox.setSelectedIndex(-1);
@@ -223,166 +222,134 @@ public class MainMenu
         infoLabel = new JLabel();
         infoLabel.setBorder(new EmptyBorder(10, 0, 0, 0));
 
-        timeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                routesShownLast = false;
+        timeButton.addActionListener(e -> {
+            routesShownLast = false;
 
+            Route currentRoute = getCurrentRoute();
+
+            if (currentRoute != null)
+            {
+                infoLabel.setText("Time taken: " + currentRoute.getDuration().formatAsWords());
+            }
+            else
+            {
+                infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
+            }
+        });
+
+        priceButton.addActionListener(e -> {
+            routesShownLast = false;
+
+            Route currentRoute = getCurrentRoute();
+
+            if (currentRoute != null)
+            {
+                String priceStr = "";
+
+                Money singlePrice = new Money(currentRoute.getSinglePrice().getPounds(),
+                        currentRoute.getSinglePrice().getPennies());
+                Money returnPrice = new Money(currentRoute.getReturnPrice().getPounds(),
+                        currentRoute.getReturnPrice().getPennies());
+
+                if (dayBox.getSelectedIndex() == dayBox.getItemCount() - 1)
+                {
+                    int discount = 10;
+
+                    singlePrice.applyDiscount(discount);
+                    returnPrice.applyDiscount(discount);
+                    priceStr = "<br>" + "By travelling on the last day of the month,<br>you receive a " +
+                            discount + "% discount!";
+                }
+
+                priceStr = ("<html>" + "Single price: " + singlePrice.formatCurrency() +
+                        "<br>" + "Return price: " + returnPrice.formatCurrency()) + priceStr + "</html>";
+                infoLabel.setText(priceStr);
+            }
+            else
+            {
+                infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
+            }
+        });
+
+        routeButton.addActionListener(e -> {
+            routesShownLast = true;
+            sortAlphabetical = false;
+
+            updateStops();
+        });
+
+        sortButton.addActionListener(e -> {
+            if (routesShownLast)
+            {
                 Route currentRoute = getCurrentRoute();
 
-                if (currentRoute != null)
+                if (currentRoute != null && currentRoute.getNumStops() > 0)
                 {
-                    infoLabel.setText("Time taken: " + currentRoute.getDuration().formatAsWords());
+                    sortAlphabetical = !sortAlphabetical;
+                    updateStops();
                 }
-                else
-                {
-                    infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
-                }
+            }
+            else
+            {
+                infoLabel.setText("You must press the route button first.");
             }
         });
 
-        priceButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
+        adminButton.addActionListener(e -> adminMenu.show());
+
+        exitButton.addActionListener(e -> frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING)));
+
+        monthBox.addActionListener(e -> {
+            int endDay;
+            int prevIndex = dayBox.getSelectedIndex();
+
+            switch (monthBox.getSelectedIndex())
             {
-                routesShownLast = false;
+                case 1:
+                    endDay = 28;
+                    break;
+                case 3:
+                case 5:
+                case 8:
+                case 10:
+                    endDay = 30;
+                    break;
+                default:
+                    endDay = 31;
+                    break;
+            }
 
-                Route currentRoute = getCurrentRoute();
+            dayBox.removeAllItems();
+            IntStream.rangeClosed(1, endDay).mapToObj(Integer::toString).forEach(x -> dayBox.addItem(x));
 
-                if (currentRoute != null)
-                {
-                    String priceStr = "";
+            if (prevIndex < 0)
+                prevIndex = 0;
+            else if (prevIndex >= endDay) prevIndex = endDay - 1;
 
-                    Money singlePrice = new Money(currentRoute.getSinglePrice().getPounds(),
-                                                  currentRoute.getSinglePrice().getPennies());
-                    Money returnPrice = new Money(currentRoute.getReturnPrice().getPounds(),
-                                                  currentRoute.getReturnPrice().getPennies());
+            dayBox.setSelectedIndex(prevIndex);
+        });
 
-                    if (dayBox.getSelectedIndex() == dayBox.getItemCount() - 1)
-                    {
-                        int discount = 10;
-
-                        singlePrice.applyDiscount(discount);
-                        returnPrice.applyDiscount(discount);
-                        priceStr = "<br>" + "By travelling on the last day of the month,<br>you receive a " + discount
-                                   + "% discount!";
-                    }
-
-                    priceStr = ("<html>" + "Single price: " + singlePrice.formatCurrency() + "<br>" + "Return price: "
-                                + returnPrice.formatCurrency())
-                               + priceStr + "</html>";
-                    infoLabel.setText(priceStr);
-                }
-                else
-                {
-                    infoLabel.setText("Please enter a outgoing date and a valid origin and destination station.");
-                }
+        fromBox.addActionListener(e -> {
+            if (fromBox.getSelectedItem() == toBox.getSelectedItem())
+            {
+                toBox.setSelectedIndex(-1);
             }
         });
 
-        routeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
+        toBox.addActionListener(e -> {
+            routesShownLast = false;
+
+            if (fromBox.getSelectedItem() == toBox.getSelectedItem())
             {
-                routesShownLast = true;
-                sortAlphabetical = false;
-
-                updateStops();
-            }
-        });
-
-        sortButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                if (routesShownLast)
-                {
-                    Route currentRoute = getCurrentRoute();
-
-                    if (currentRoute != null && currentRoute.getNumStops() > 0)
-                    {
-                        sortAlphabetical = !sortAlphabetical;
-                        updateStops();
-                    }
-                }
-                else
-                {
-                    infoLabel.setText("You must press the route button first.");
-                }
-            }
-        });
-
-        adminButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                adminMenu.show();
-            }
-        });
-
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-            }
-        });
-
-        monthBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                int endDay;
-                int prevIndex = dayBox.getSelectedIndex();
-
-                switch (monthBox.getSelectedIndex())
-                {
-                    case 1:
-                        endDay = 28;
-                        break;
-                    case 3:
-                    case 5:
-                    case 8:
-                    case 10:
-                        endDay = 30;
-                        break;
-                    default:
-                        endDay = 31;
-                        break;
-                }
-
-                dayBox.removeAllItems();
-                IntStream.rangeClosed(1, endDay).mapToObj(Integer::toString).forEach(x -> dayBox.addItem(x));
-
-                if (prevIndex < 0)
-                    prevIndex = 0;
-                else if (prevIndex >= endDay) prevIndex = endDay - 1;
-
-                dayBox.setSelectedIndex(prevIndex);
-            }
-        });
-
-        fromBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                if (fromBox.getSelectedItem() == toBox.getSelectedItem())
-                {
-                    toBox.setSelectedIndex(-1);
-                }
-            }
-        });
-
-        toBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                routesShownLast = false;
-
-                if (fromBox.getSelectedItem() == toBox.getSelectedItem())
-                {
-                    fromBox.setSelectedIndex(-1);
-                }
+                fromBox.setSelectedIndex(-1);
             }
         });
 
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent)
             {
-                int exit = JOptionPane.showConfirmDialog(frame, "Are you sure you want to exit the program?", "Exit",
-                                                         JOptionPane.YES_NO_OPTION);
+                int exit = JOptionPane.showConfirmDialog(frame, "Are you sure you want to exit the program?",
+                        "Exit", JOptionPane.YES_NO_OPTION);
 
                 if (exit == JOptionPane.YES_OPTION)
                 {

@@ -13,8 +13,8 @@ public class Money
     /**
      * Constructor taking separate pounds and pennies.
      * 
-     * @param pounds
-     * @param pennies
+     * @param pounds number of whole pounds
+     * @param pennies number of whole pennies
      */
     public Money(int pounds, int pennies)
     {
@@ -96,7 +96,7 @@ public class Money
     {
         int totalPennies = (wholePounds * 100 + wholePennies);
         totalPennies = (int) Math.ceil(totalPennies * (1 - ((double) percent / 100)));
-        wholePounds = (int) (totalPennies / 100);
+        wholePounds = totalPennies / 100;
         wholePennies = totalPennies % 100;
     }
 }

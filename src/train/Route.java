@@ -25,7 +25,7 @@ public class Route
      */
     public Route(Station[] stations, Duration time, Money singlePrice, Money returnPrice)
     {
-        this.stations = new ArrayList<Station>(Arrays.asList(stations));
+        this.stations = new ArrayList<>(Arrays.asList(stations));
         this.time = time;
         this.singlePrice = singlePrice;
         this.returnPrice = returnPrice;
@@ -63,7 +63,7 @@ public class Route
                  int returnPennies)
     {
         this(stations, new Duration(totalMins), new Money(singlePounds, singlePennies),
-             new Money(returnPounds, returnPennies));
+                new Money(returnPounds, returnPennies));
     }
 
     /**
@@ -84,7 +84,7 @@ public class Route
                  int returnPennies)
     {
         this(start, end, new Duration(totalMins), new Money(singlePounds, singlePennies),
-             new Money(returnPounds, returnPennies));
+                new Money(returnPounds, returnPennies));
     }
 
     /**

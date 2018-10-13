@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * A helper class which saves and loads to/from files.
- * 
+ *
  * @author SteelColossus
  */
 public final class FileManager
@@ -16,7 +16,7 @@ public final class FileManager
     /**
      * Write to a file at the specified path with the given information about
      * routes.
-     * 
+     *
      * @param path the path of the file
      * @param routes the routes information
      * @return whether the write operation was successful
@@ -36,11 +36,12 @@ public final class FileManager
                     if (si != r.getNumStations() - 1) newLine.append(",");
                 }
 
-                newLine.append("],");
-                newLine.append(r.getDuration().getTotalMinutes() + "," + r.getSinglePrice().getPounds() + ","
-                               + r.getSinglePrice().getPennies() + "," + r.getReturnPrice().getPounds() + ","
-                               + r.getReturnPrice().getPennies());
-                newLine.append(System.getProperty("line.separator"));
+                newLine.append("],").append(r.getDuration().getTotalMinutes()).append(",")
+                        .append(r.getSinglePrice().getPounds()).append(",")
+                        .append(r.getSinglePrice().getPennies()).append(",")
+                        .append(r.getReturnPrice().getPounds()).append(",")
+                        .append(r.getReturnPrice().getPennies())
+                        .append(System.getProperty("line.separator"));
 
                 fw.write(newLine.toString());
             }
@@ -59,7 +60,7 @@ public final class FileManager
 
     /**
      * Reads the route information from a file at the specified path.
-     * 
+     *
      * @param path the path of the file
      * @return a list of routes that were interpreted from the file
      */
@@ -67,7 +68,7 @@ public final class FileManager
     {
         try
         {
-            ArrayList<Route> routes = new ArrayList<Route>();
+            ArrayList<Route> routes = new ArrayList<>();
 
             for (String routeStr : Files.readAllLines(Paths.get(path)))
             {
@@ -88,13 +89,10 @@ public final class FileManager
 
                 for (String stationStr : stationStrArray)
                 {
-                    boolean isMain = (stationStr.indexOf("|m") != -1);
+                    boolean isMain = stationStr.contains("|m");
 
                     stationArray[snum] = new Station(stationStr.substring(0,
-                                                                          stationStr.length()
-                                                                             - ((isMain) ? "|m".length() : 0))
-                                                               .trim(),
-                                                     isMain);
+                            stationStr.length() - ((isMain) ? "|m".length() : 0)).trim(), isMain);
 
                     snum++;
                 }

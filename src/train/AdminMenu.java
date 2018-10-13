@@ -81,113 +81,97 @@ public class AdminMenu
         loadButton = new JButton("Retrieve routes");
         exitButton = new JButton("Exit");
 
-        inputButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
+        inputButton.addActionListener(e -> inputRouteMenu.show());
+
+        saveButton.addActionListener(e -> {
+            int res = fileChooser.showSaveDialog(frame);
+
+            if (res == JFileChooser.APPROVE_OPTION)
             {
-                inputRouteMenu.show();
+                String fileName = fileChooser.getSelectedFile().getName();
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+
+                if (new File(path).isFile())
+                {
+                    int contRes = JOptionPane.showConfirmDialog(frame,
+                            "The file name that you are attempting to save the file as already exists. Would you like to overwrite the existing file?",
+                            "File already exists", JOptionPane.YES_NO_OPTION);
+
+                    if (contRes != JOptionPane.YES_OPTION) return;
+                }
+
+                if (!fileName.contains("."))
+                {
+                    path += ".trm";
+                }
+                else if (!fileName.contains(".trm"))
+                {
+                    int contRes = JOptionPane.showConfirmDialog(frame,
+                            "The file type that you are attempting to save the file as appears to be unsupported. Are you sure you wish to continue?",
+                            "Unsupported file type", JOptionPane.YES_NO_OPTION);
+
+                    if (contRes != JOptionPane.YES_OPTION) return;
+                }
+
+                boolean success = manager.updateFile(path);
+
+                if (success)
+                {
+                    JOptionPane.showMessageDialog(frame, "The routes were saved successfully.",
+                                                  "Saved successfully", JOptionPane.INFORMATION_MESSAGE);
+                    inputRouteMenu.updateStops();
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(frame, "There was an error in saving the routes.",
+                                                  "Save was unsuccessful", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
-        saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                int res = fileChooser.showSaveDialog(frame);
+        loadButton.addActionListener(e -> {
+            int res = fileChooser.showOpenDialog(frame);
 
-                if (res == JFileChooser.APPROVE_OPTION)
+            if (res == JFileChooser.APPROVE_OPTION)
+            {
+                if (fileChooser.getSelectedFile().exists())
                 {
                     String fileName = fileChooser.getSelectedFile().getName();
                     String path = fileChooser.getSelectedFile().getAbsolutePath();
 
-                    if (new File(path).isFile())
+                    if (!fileName.contains(".trm"))
                     {
                         int contRes = JOptionPane.showConfirmDialog(frame,
-                                                                    "The file name that you are attempting to save the file as already exists. Would you like to overwrite the existing file?",
-                                                                    "File already exists", JOptionPane.YES_NO_OPTION);
+                                "The file type of the file that you are attempting to open appears to be unsupported. Are you sure you wish to continue?",
+                                "Unsupported file type",
+                                JOptionPane.YES_NO_OPTION);
 
                         if (contRes != JOptionPane.YES_OPTION) return;
                     }
 
-                    if (!fileName.contains("."))
-                    {
-                        path += ".trm";
-                    }
-                    else if (!fileName.contains(".trm"))
-                    {
-                        int contRes = JOptionPane.showConfirmDialog(frame,
-                                                                    "The file type that you are attempting to save the file as appears to be unsupported. Are you sure you wish to continue?",
-                                                                    "Unsupported file type", JOptionPane.YES_NO_OPTION);
-
-                        if (contRes != JOptionPane.YES_OPTION) return;
-                    }
-
-                    boolean success = manager.updateFile(path);
+                    boolean success = manager.updateSystemFromFile(path);
 
                     if (success)
                     {
-                        JOptionPane.showMessageDialog(frame, "The routes were saved successfully.",
-                                                      "Saved successfully", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, "The current routes were updated successfully.",
+                                "Updated successfully", JOptionPane.INFORMATION_MESSAGE);
                         inputRouteMenu.updateStops();
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(frame, "There was an error in saving the routes.",
-                                                      "Save was unsuccessful", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, "There was an error in updating the current routes.",
+                                "Update was unsuccessful", JOptionPane.ERROR_MESSAGE);
                     }
                 }
-            }
-        });
-
-        loadButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                int res = fileChooser.showOpenDialog(frame);
-
-                if (res == JFileChooser.APPROVE_OPTION)
+                else
                 {
-                    if (fileChooser.getSelectedFile().exists())
-                    {
-                        String fileName = fileChooser.getSelectedFile().getName();
-                        String path = fileChooser.getSelectedFile().getAbsolutePath();
-
-                        if (!fileName.contains(".trm"))
-                        {
-                            int contRes = JOptionPane.showConfirmDialog(frame,
-                                                                        "The file type of the file that you are attempting to open appears to be unsupported. Are you sure you wish to continue?",
-                                                                        "Unsupported file type",
-                                                                        JOptionPane.YES_NO_OPTION);
-
-                            if (contRes != JOptionPane.YES_OPTION) return;
-                        }
-
-                        boolean success = manager.updateSystemFromFile(path);
-
-                        if (success)
-                        {
-                            JOptionPane.showMessageDialog(frame, "The current routes were updated successfully.",
-                                                          "Updated successfully", JOptionPane.INFORMATION_MESSAGE);
-                            inputRouteMenu.updateStops();
-                        }
-                        else
-                        {
-                            JOptionPane.showMessageDialog(frame, "There was an error in updating the current routes.",
-                                                          "Update was unsuccessful", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(frame, "The selected file does not exist.",
-                                                      "File opening was unsuccessful", JOptionPane.WARNING_MESSAGE);
-                    }
+                    JOptionPane.showMessageDialog(frame, "The selected file does not exist.",
+                            "File opening was unsuccessful", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
 
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-            }
-        });
+        exitButton.addActionListener(e -> frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING)));
 
         buttonPanel.add(inputButton);
         buttonPanel.add(saveButton);

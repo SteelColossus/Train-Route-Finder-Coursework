@@ -53,7 +53,7 @@ public class InputRouteMenu
     public InputRouteMenu(RouteManager rm)
     {
         manager = rm;
-        existingStops = new ArrayList<JLabel>();
+        existingStops = new ArrayList<>();
 
         defaultSetup();
     }
@@ -75,7 +75,7 @@ public class InputRouteMenu
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation((screenSize.width / 2) - (frame.getSize().width / 2),
-                          (screenSize.height / 2) - (frame.getSize().height / 2));
+                (screenSize.height / 2) - (frame.getSize().height / 2));
 
         stopsPanel = new JPanel();
         stopsPanel.setLayout(new BoxLayout(stopsPanel, BoxLayout.Y_AXIS));
@@ -85,56 +85,46 @@ public class InputRouteMenu
 
         forceMinSizePanel = new JPanel();
 
-        ArrayList<String> stationNameList = new ArrayList<String>();
+        ArrayList<String> stationNameList = new ArrayList<>();
 
         for (int i = 0; i < manager.getNumStations(); i++)
         {
             Station s = manager.getStation(i);
+            String name = s.getName();
 
-            if (s.isMain() && !stationNameList.contains(s))
+            if (s.isMain() && !stationNameList.contains(name))
             {
-                stationNameList.add(s.getName());
+                stationNameList.add(name);
             }
         }
 
-        fromBox = new JComboBox<String>(stationNameList.toArray(new String[0]));
-        toBox = new JComboBox<String>(stationNameList.toArray(new String[0]));
+        fromBox = new JComboBox<>(stationNameList.toArray(new String[0]));
+        toBox = new JComboBox<>(stationNameList.toArray(new String[0]));
 
         fromBox.setSelectedIndex(-1);
         toBox.setSelectedIndex(-1);
 
         exitButton = new JButton("Exit");
 
-        fromBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
+        fromBox.addActionListener(e -> {
+            if (fromBox.getSelectedItem() == toBox.getSelectedItem())
             {
-                if (fromBox.getSelectedItem() == toBox.getSelectedItem())
-                {
-                    toBox.setSelectedIndex(-1);
-                }
-
-                updateStops();
+                toBox.setSelectedIndex(-1);
             }
+
+            updateStops();
         });
 
-        toBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
+        toBox.addActionListener(e -> {
+            if (fromBox.getSelectedItem() == toBox.getSelectedItem())
             {
-                if (fromBox.getSelectedItem() == toBox.getSelectedItem())
-                {
-                    fromBox.setSelectedIndex(-1);
-                }
-
-                updateStops();
+                fromBox.setSelectedIndex(-1);
             }
+
+            updateStops();
         });
 
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-            }
-        });
+        exitButton.addActionListener(e -> frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING)));
 
         forceMinSizePanel.add(exitButton);
 
@@ -164,8 +154,8 @@ public class InputRouteMenu
         }
         else
         {
-            JOptionPane.showMessageDialog(frame, "Please enter a valid name for this station.", "Invalid station name",
-                                          JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Please enter a valid name for this station.",
+                    "Invalid station name", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -191,8 +181,7 @@ public class InputRouteMenu
 
         if (fromBox.getSelectedIndex() > -1 && toBox.getSelectedIndex() > -1)
         {
-            Route currentRoute = manager.getRoute(fromBox.getSelectedItem().toString(),
-                                                  toBox.getSelectedItem().toString());
+            Route currentRoute = manager.getRoute(fromBox.getSelectedItem().toString(), toBox.getSelectedItem().toString());
 
             if (currentRoute != null)
             {
@@ -207,12 +196,7 @@ public class InputRouteMenu
 
                     final int stopNum = i;
 
-                    deleteButton.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e)
-                        {
-                            removeStop(stopNum);
-                        }
-                    });
+                    deleteButton.addActionListener(e -> removeStop(stopNum));
 
                     existingStops.add(currentStop);
 
@@ -229,12 +213,7 @@ public class InputRouteMenu
                 newStop.setPreferredSize(new Dimension(100, newStop.getPreferredSize().height));
                 addButton.setPreferredSize(new Dimension(addButton.getPreferredSize().width, 25));
 
-                addButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e)
-                    {
-                        addNewStop();
-                    }
-                });
+                addButton.addActionListener(e -> addNewStop());
 
                 newStopPanel.add(newStop);
                 newStopPanel.add(addButton);
